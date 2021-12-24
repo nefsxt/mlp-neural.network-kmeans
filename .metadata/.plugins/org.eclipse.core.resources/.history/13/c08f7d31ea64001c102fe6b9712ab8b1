@@ -1,0 +1,47 @@
+package neyronika1;
+
+import java.util.Random;
+
+public class perceptron {
+	int inputsize = 0;
+	float[] input;
+	float[] weights;
+	float bias = 1;
+	
+	public perceptron(int inputsize) {
+	    Random rand = new Random();
+
+		
+		this.inputsize = inputsize;
+		this.input = new float[inputsize];
+		this.weights = new float[inputsize];
+		
+		for (int i = 0;i < inputsize;i++) {
+			this.weights[i] = rand.nextFloat();
+		}
+	}
+	
+	public float relu(float value) {
+		return Math.max(0,value);
+	}
+	public float tahn(float value) {
+		return (float)Math.tanh(value);
+	}
+	
+	public void getOutput() {
+		for (int i = 0;i < this.inputsize;i++) {
+			System.out.println(this.weights[i]);
+		}
+	}
+	public void ForwardPass() {
+		for (int i = 0;i < this.inputsize;i++) {
+			System.out.println(this.weights[i]);
+		}
+	}
+	
+	public void getWeights() {
+		for (int i = 0;i < this.inputsize;i++) {
+			System.out.println(this.weights[i]);
+		}
+	}
+}

@@ -1,0 +1,16 @@
+package neyronika1;
+
+public class perceptron {
+	int input = 0;
+	public perceptron(int input) {
+		this.input = input;
+	}
+	
+	public static void relu(double value) {
+		return max(0,value);
+	}
+	public double tahn(double value) 
+	{
+		return Math.tanh(value);
+	}
+}

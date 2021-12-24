@@ -1,0 +1,22 @@
+package neyronika1;
+
+public class perceptron {
+	int inputsize = 0;
+	int[] input;
+	
+	public perceptron(int inputsize) {
+		this.inputsize = inputsize;
+		
+		this.input = new int[inputsize];
+		for (int i = 0;i < inputsize;i++) {
+			
+		}
+	}
+	
+	public double relu(double value) {
+		return Math.max(0,value);
+	}
+	public double tahn(double value) {
+		return Math.tanh(value);
+	}
+}
