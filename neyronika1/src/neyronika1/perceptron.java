@@ -19,7 +19,7 @@ public class perceptron {
 		this.weights = new float[inputsize];
 		
 		for (int i = 0;i < inputsize;i++) {
-			this.weights[i] = rand.nextFloat();
+			this.weights[i] = rand.nextFloat()*2 -1;
 		}
 	}
 	

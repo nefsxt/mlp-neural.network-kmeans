@@ -1,4 +1,5 @@
 package neyronika1;
+import java.util.Arrays;
 import java.util.Random;
 import java.io.File;  // Import the File class
 import java.io.IOException;  // Import the IOException class to handle error
@@ -22,6 +23,7 @@ public class Main {
 	public static void createS1() {
 		
 		IO.createFile("dataset1.txt");
+		IO.createFile("dataset1withExamples.txt");
 		IO.createFile("c1.txt");
 		IO.createFile("c2.txt");
 		IO.createFile("c3.txt");
@@ -73,19 +75,22 @@ public class Main {
 
 		
 	    for(int i = 0;i < 8000;i++) {
+	    	
+	    	
 	    	if(c1[i][0] != -2.0) {
-		    	IO.WriteToFile("c1.txt",c1[i][0],c1[i][1]);
+		    	IO.WriteToFile("dataset1withExamples.txt",c1[i][0],c1[i][1],"1");
 	    	}
 	    	if(c2[i][0] != -2.0) {
-		    	IO.WriteToFile("c2.txt",c2[i][0],c2[i][1]);
+		    	IO.WriteToFile("dataset1withExamples.txt",c2[i][0],c2[i][1],"2");
 	    	}
 	    	if(c3[i][0] != -2.0) {
-		    	IO.WriteToFile("c3.txt",c3[i][0],c3[i][1]);
+		    	IO.WriteToFile("dataset1withExamples.txt",c3[i][0],c3[i][1],"3");
 	    	}
 	    	if(c4[i][0] != -2.0) {
-		    	IO.WriteToFile("c4.txt",c4[i][0],c4[i][1]);
+		    	IO.WriteToFile("dataset1withExamples.txt",c4[i][0],c4[i][1],"4");
 	    	}
 	    }
+	    
 	    
 	}
 	
@@ -215,11 +220,23 @@ public class Main {
 	
 		//createS1();
 		//createS2();
+		float[][] miniBranchingdata = IO.ReadFromFile("dataset1withExamples.txt", 8000,3);
+		
+		float[][] miniBranch = new float[10][2];
+		float[] outputsForMiniBranch = new float[10];
+
+		
+		for(int i = 0;i < 10;i++) {
+			miniBranch[i][0] =  miniBranchingdata[i][0];
+			miniBranch[i][1] =  miniBranchingdata[i][1];
+
+			outputsForMiniBranch[i] = miniBranchingdata[i][2]; 
+		}
+
 		
 		
-		float[] test = {1f};
 //		perceptron P1 = new perceptron(5);
-//		P1.setInputs(test);
+//		P1.setInputs(miniBranch);
 //		P1.getWeights();
 //		System.out.println(P1.evaluate());
 		
@@ -237,38 +254,56 @@ public class Main {
 
 		
 		for(int i = 0;i < D;i++) layerinput[i] = new perceptron(1,"Tanh");
-		for(int i = 0;i < H1;i++) layerH1[i] = new perceptron(Array.getLength(layerinput),"Tanh");
-		for(int i = 0;i < H2;i++) layerH2[i] = new perceptron(Array.getLength(layerH1),"Tanh");
+		for(int i = 0;i < H1;i++) layerH1[i] = new perceptron(Array.getLength(layerinput),"Relu");
+		for(int i = 0;i < H2;i++) layerH2[i] = new perceptron(Array.getLength(layerH1),"Relu");
 		for(int i = 0;i < P;i++) layeroutput[i] = new perceptron(Array.getLength(layerH2),"output");
 		
 
 		for(int i = 0;i < D;i++) { //layerinput
-			layerinput[i].setInputs(test);
+			layerinput[i].setInputs(miniBranch[i]);
 			LIoutputs[i] = layerinput[i].evaluate();
-			System.out.println(layerinput[i].evaluate() +  "  Input  " + i );
+			//System.out.println(layerinput[i].evaluate() +  "  Input  " + i );
 		}
 		for(int i = 0;i < H1;i++) { //h1
 			layerH1[i].setInputs(LIoutputs);
 			LH1outputs[i] = layerH1[i].evaluate();
-			System.out.println(layerH1[i].evaluate() + "  H1  " + i);
+			//System.out.println(layerH1[i].evaluate() + "  H1  " + i);
 		}
 		for(int i = 0;i < H2;i++) { //h2
 			layerH2[i].setInputs(LH1outputs);
 			LH2outputs[i] = layerH2[i].evaluate();
-			System.out.println(layerH2[i].evaluate() + "  H2  " + i);
+			//System.out.println(layerH2[i].evaluate() + "  H2  " + i);
 		}
 		for(int i = 0;i < P;i++) { //h2
 			layeroutput[i].setInputs(LH2outputs);
 			Loutputs[i] = layeroutput[i].evaluate();
-			System.out.println(layeroutput[i].evaluate() + "  OUT  " + i);
-		}
+			//System.out.println(layeroutput[i].evaluate() + "  OUT  " + i);
+		}	
 		
 		
-
+		
 		
 	    long end = System.currentTimeMillis();
 	    
 	    System.out.println((end - start) + " ms");
 
 	}
+	
+	public int backdrop() {
+		
+		return 0;
+	}
+	
+	public float[] calculateError(float [] x,float [] t) {
+		int d = Array.getLength(x);
+		float[] Error = new float[d];
+		
+		for(int i = 0;i < d;i++) {
+			Error[i] += Math.pow((x[i] - t[i]),2);
+		}
+		
+		return Error;
+	}
 }
+
+
