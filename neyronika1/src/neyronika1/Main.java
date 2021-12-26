@@ -19,6 +19,26 @@ public class Main {
 	static int c3size = 0;
 	static int c4size = 0;
 	
+	 static int D = 2;
+	 static int H1 = 2;
+	 static int H2 = 2;
+	 static int P = 4;
+
+	static perceptron layerinput[ ]= new perceptron[D];
+	static perceptron layerH1[ ]= new perceptron[H1];
+	static perceptron layerH2[ ]= new perceptron[H2];
+	static perceptron layeroutput[ ]= new perceptron[P];
+
+	static float LIoutputs[] = new float[D];
+	static float LH1outputs[] = new float[H1];
+	static float LH2outputs[] = new float[H2];
+	static float Loutputs[] = new float[P];
+
+
+	static float[][] miniBranchingdata;
+	static float[][] miniBranch = new float[10][2];
+	static float[] outputsForMiniBranch = new float[10];
+	
 	
 	public static void createS1() {
 		
@@ -79,15 +99,19 @@ public class Main {
 	    	
 	    	if(c1[i][0] != -2.0) {
 		    	IO.WriteToFile("dataset1withExamples.txt",c1[i][0],c1[i][1],"1");
+		    	IO.WriteToFile("c1.txt",c1[i][0],c1[i][1]);
 	    	}
 	    	if(c2[i][0] != -2.0) {
 		    	IO.WriteToFile("dataset1withExamples.txt",c2[i][0],c2[i][1],"2");
+		    	IO.WriteToFile("c2.txt",c2[i][0],c2[i][1]);
 	    	}
 	    	if(c3[i][0] != -2.0) {
 		    	IO.WriteToFile("dataset1withExamples.txt",c3[i][0],c3[i][1],"3");
+		    	IO.WriteToFile("c3.txt",c3[i][0],c3[i][1]);
 	    	}
 	    	if(c4[i][0] != -2.0) {
 		    	IO.WriteToFile("dataset1withExamples.txt",c4[i][0],c4[i][1],"4");
+		    	IO.WriteToFile("c4.txt",c4[i][0],c4[i][1]);
 	    	}
 	    }
 	    
@@ -210,48 +234,32 @@ public class Main {
 	    }
 	}
 	
-	public static void main(String[] args) {
-		long start = System.currentTimeMillis();
-		
-		int D = 2;
-		int H1 = 2;
-		int H2 = 2;
-		int P = 4;
 	
-		//createS1();
-		//createS2();
-		float[][] miniBranchingdata = IO.ReadFromFile("dataset1withExamples.txt", 8000,3);
-		
-		float[][] miniBranch = new float[10][2];
-		float[] outputsForMiniBranch = new float[10];
-
-		
+	public static void miniBatchLoader()
+	{
+	 	miniBranchingdata = IO.ReadFromFile("dataset1withExamples.txt", 8000,3);
 		for(int i = 0;i < 10;i++) {
 			miniBranch[i][0] =  miniBranchingdata[i][0];
 			miniBranch[i][1] =  miniBranchingdata[i][1];
 
 			outputsForMiniBranch[i] = miniBranchingdata[i][2]; 
 		}
-
+	
+	}
+	public static void miniBatchErrorCalc()
+	{
+		float[] o = (calculateError(Loutputs,outputsForMiniBranch[0]));
+		for(int i = 0;i < Array.getLength(o);i++) {
+			System.out.println(o[i]);
+		}
+	
+	}
+	
+	//this method will likely need to do more stuff or need to be altered to take arguments 
+	public static void forwardPass()
+	{
+	
 		
-		
-//		perceptron P1 = new perceptron(5);
-//		P1.setInputs(miniBranch);
-//		P1.getWeights();
-//		System.out.println(P1.evaluate());
-		
-		
-		perceptron layerinput[ ]= new perceptron[D];
-		perceptron layerH1[ ]= new perceptron[H1];
-		perceptron layerH2[ ]= new perceptron[H2];
-		perceptron layeroutput[ ]= new perceptron[P];
-
-		float LIoutputs[] = new float[D];
-		float LH1outputs[] = new float[H1];
-		float LH2outputs[] = new float[H2];
-		float Loutputs[] = new float[P];
-
-
 		
 		for(int i = 0;i < D;i++) layerinput[i] = new perceptron(1,"Tanh");
 		for(int i = 0;i < H1;i++) layerH1[i] = new perceptron(Array.getLength(layerinput),"Relu");
@@ -282,10 +290,27 @@ public class Main {
 		
 		
 		
-		float[] o = (calculateError(Loutputs,outputsForMiniBranch[0]));
-		for(int i = 0;i < Array.getLength(o);i++) {
-			System.out.println(o[i]);
-		}
+	}	
+	
+	
+	public static void main(String[] args) {
+		long start = System.currentTimeMillis();
+		
+		
+
+		//createS1();
+		//createS2();
+		
+
+		
+
+		
+		miniBatchLoader();
+		forwardPass();
+		miniBatchErrorCalc();
+		
+		
+		
 		
 	    long end = System.currentTimeMillis();
 	    
@@ -321,5 +346,3 @@ public class Main {
 		return Error;
 	}
 }
-
-
