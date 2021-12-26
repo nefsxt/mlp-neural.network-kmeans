@@ -277,11 +277,15 @@ public class Main {
 		for(int i = 0;i < P;i++) { //h2
 			layeroutput[i].setInputs(LH2outputs);
 			Loutputs[i] = layeroutput[i].evaluate();
-			//System.out.println(layeroutput[i].evaluate() + "  OUT  " + i);
+			System.out.println(layeroutput[i].evaluate() + "  OUT  " + i);
 		}	
 		
 		
 		
+		float[] o = (calculateError(Loutputs,outputsForMiniBranch[0]));
+		for(int i = 0;i < Array.getLength(o);i++) {
+			System.out.println(o[i]);
+		}
 		
 	    long end = System.currentTimeMillis();
 	    
@@ -294,12 +298,24 @@ public class Main {
 		return 0;
 	}
 	
-	public float[] calculateError(float [] x,float [] t) {
+	public static float[] calculateError(float [] x,float t) {
+		float[] rightanswer = new float[Array.getLength(x)];
+		for(int i = 0;i < Array.getLength(x);i++) {
+			if(i == t - 1) {
+				rightanswer[i] = 1;
+			}else {
+				rightanswer[i] = 0;
+			}
+		}
+		for(int i = 0;i < Array.getLength(x);i++) {
+			System.out.println(rightanswer[i]);
+		}
+		
 		int d = Array.getLength(x);
 		float[] Error = new float[d];
 		
 		for(int i = 0;i < d;i++) {
-			Error[i] += Math.pow((x[i] - t[i]),2);
+			Error[i] += Math.pow((x[i] - rightanswer[i]),2);
 		}
 		
 		return Error;
