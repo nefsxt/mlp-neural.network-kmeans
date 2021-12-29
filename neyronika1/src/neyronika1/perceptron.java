@@ -5,12 +5,14 @@ import java.util.Random;
 public class perceptron {
 	int inputsize = 0;
 	float[] input;
+	float output;
 	float[] weights;
 	float bias = 1;
 	String function;
 	
-	public perceptron(int inputsize,String function) {
+	public perceptron(int inputsize,String function, float bias) {
 		this.function = function;
+		this.bias = bias;
 	    Random rand = new Random();
 
 		
@@ -23,6 +25,24 @@ public class perceptron {
 		}
 	}
 	
+	public void evaluate() {
+		float SUM = bias;
+		for(int i = 0;i < this.inputsize;i++) {
+			SUM += this.input[i]*this.weights[i];
+		}
+		if (this.function.equals("Tanh")) {
+			this.output = Tanh(SUM);
+		}else if (this.function.equals("Relu")) {
+			this.output = relu(SUM);
+		}else {
+			this.output = SUM;
+		}
+	}
+	
+	////////////////////////
+	//ACTIVATION FUNCTIONS//
+	//////////////////////////////////////////////////////////////////////
+	
 	public float relu(float value) {
 		return Math.max(0,value);
 	}
@@ -30,34 +50,25 @@ public class perceptron {
 		return (float)Math.tanh(value);
 	}
 	
-	
+	///////////////////
+	//SETTERS GETTERS//
+	//////////////////////////////////////////////////////////////////////
 	
 	public void setInputs(float[] inputs) {
 		for (int i = 0;i < this.inputsize;i++) {
 			this.input[i] = inputs[i];
 		}
 	}
-	
-	
-
-	public float evaluate() {
-		float SUM = bias;
-		for(int i = 0;i < this.inputsize;i++) {
-			SUM += this.input[i]*this.weights[i];
+	public void setInputs(float input) {
+		for (int i = 0;i < this.inputsize;i++) {
+			this.input[i] = input;
 		}
-		if (this.function.equals("Tanh")) {
-			return Tanh(SUM);
-		}else if (this.function.equals("Relu")) {
-			return relu(SUM);
-		}else {
-			return SUM;
-
-		}
-		
 	}
 	
-	
-	
+	public float getOutput() {
+		return output;
+	}
+		
 	
 	public void getWeights() {
 		for (int i = 0;i < this.inputsize;i++) {
