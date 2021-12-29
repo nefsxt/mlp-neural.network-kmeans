@@ -19,6 +19,9 @@ public class Main {
 		int H2 = 2;
 		int P = 4;
 		int perceptronsPerLayer[] = {2,2,2,4};
+		perceptron perceptrons[][] = new perceptron[hiddenlayers+2][4];
+		float[][] perceptronOutputs = new float[hiddenlayers+2][4];
+		
 	
 		//S1_S2.createS1();
 		//S1_S2.createS2();
@@ -52,7 +55,7 @@ public class Main {
 		//CREATE PERCEPTRONS//
 		//////////////////////////////////////////////////////////////////////
 		
-		perceptron perceptrons[][] = new perceptron[hiddenlayers+2][4];
+
 		
 		for(int i = 0;i < D;i++) perceptrons[0][i] = new perceptron(1,"Tanh",0);
 		for(int i = 1;i < hiddenlayers+1;i++) {
@@ -71,13 +74,13 @@ public class Main {
 		for(int i = 0;i < D;i++) { //layerinput
 			perceptrons[0][i].setInputs(inputs[0][i]);
 			perceptrons[0][i].evaluate();
-			Loutputs[i] = perceptrons[0][i].getOutput();
+			perceptronOutputs[0][i] = perceptrons[0][i].getOutput();
 		}
 		for(int i = 1;i < hiddenlayers+2;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				perceptrons[i][j].setInputs(Loutputs);
+				perceptrons[i][j].setInputs(perceptronOutputs[i-1]);
 				perceptrons[i][j].evaluate();
-				Loutputs[i] = perceptrons[i][j].getOutput();
+				perceptronOutputs[i][j] = perceptrons[i][j].getOutput();
 			}
 		}
 		for(int i = 0;i < 4;i++) {
