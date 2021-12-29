@@ -15,6 +15,7 @@ public class perceptron {
 	float[] outputweights;
 	float[] NextPerceptronDeltas;
 	int NextLayerLength;
+	float learningRate = 0.0001f;
 	
 	public perceptron(int inputsize,String function, float bias) {
 		this.function = function;
@@ -44,6 +45,7 @@ public class perceptron {
 		}else {
 			this.output = SUM;
 		}
+		//System.out.println(this.output);
 	}
 	
 	public void calcDelta() {
@@ -62,7 +64,11 @@ public class perceptron {
 		//System.out.println(this.delta);
 	}
 	
-	
+	public void updateWeights() {
+		for(int i = 0;i < inputsize;i++) {
+			weights[i] = weights[i] + learningRate*delta*output;
+		}
+	}
 	
 	////////////////////////
 	//ACTIVATION FUNCTIONS//
@@ -89,13 +95,13 @@ public class perceptron {
 	
 	public float[] getNextPerceptronDeltas() {
 		for (int i = 0;i < this.inputsize;i++) {
-			System.out.println(this.NextPerceptronDeltas[i]);
+			//System.out.println(this.NextPerceptronDeltas[i]);
 		}
 		return this.NextPerceptronDeltas;
 	}
 	
 	public float getDelta() {
-		System.out.println(delta);
+		//System.out.println(delta);
 		return this.delta;
 	}
 	
