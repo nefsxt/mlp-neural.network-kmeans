@@ -1,5 +1,6 @@
 package neyronika1;
 
+import java.lang.reflect.Array;
 import java.util.Random;
 
 public class perceptron {
@@ -7,8 +8,13 @@ public class perceptron {
 	float[] input;
 	float output;
 	float[] weights;
+	float u;
 	float bias = 1;
+	float delta;
 	String function;
+	float[] outputweights;
+	float[] NextPerceptronDeltas;
+	int NextLayerLength;
 	
 	public perceptron(int inputsize,String function, float bias) {
 		this.function = function;
@@ -30,6 +36,7 @@ public class perceptron {
 		for(int i = 0;i < this.inputsize;i++) {
 			SUM += this.input[i]*this.weights[i];
 		}
+		this.u = SUM;
 		if (this.function.equals("Tanh")) {
 			this.output = Tanh(SUM);
 		}else if (this.function.equals("Relu")) {
@@ -38,6 +45,24 @@ public class perceptron {
 			this.output = SUM;
 		}
 	}
+	
+	public void calcDelta() {
+		if(function.equals("Tanh")) {
+			float SUM = 0;
+			for(int i = 0;i < NextLayerLength;i++) {
+				SUM += outputweights[i] * NextPerceptronDeltas[i];
+			}
+			this.delta = (float)(1 - Math.pow(Math.tanh(this.u),2)) * SUM;
+		}else {}
+		//System.out.println(this.delta);
+	}
+	
+	public void calcDelta(float rightAnswer) {
+		this.delta = rightAnswer - this.output;
+		//System.out.println(this.delta);
+	}
+	
+	
 	
 	////////////////////////
 	//ACTIVATION FUNCTIONS//
@@ -53,6 +78,34 @@ public class perceptron {
 	///////////////////
 	//SETTERS GETTERS//
 	//////////////////////////////////////////////////////////////////////
+	
+	public void setNextLayerLength(int length) {
+		this.NextLayerLength = length;
+	}
+	
+	public void setNextPerceptronDeltas(float[] deltas) {
+		this.NextPerceptronDeltas = deltas;
+	}
+	
+	public float[] getNextPerceptronDeltas() {
+		for (int i = 0;i < this.inputsize;i++) {
+			System.out.println(this.NextPerceptronDeltas[i]);
+		}
+		return this.NextPerceptronDeltas;
+	}
+	
+	public float getDelta() {
+		System.out.println(delta);
+		return this.delta;
+	}
+	
+	
+	public void setOutputWeights(float[] weights) {
+		this.outputweights = weights;
+	}
+	public float[] getOutputWeights() {
+		return this.outputweights;
+	}
 	
 	public void setInputs(float[] inputs) {
 		for (int i = 0;i < this.inputsize;i++) {
@@ -70,9 +123,10 @@ public class perceptron {
 	}
 		
 	
-	public void getWeights() {
+	public float[] getWeights() {
 		for (int i = 0;i < this.inputsize;i++) {
-			System.out.println(this.weights[i]);
+			//System.out.println(this.weights[i]);
 		}
+		return this.weights;
 	}
 }

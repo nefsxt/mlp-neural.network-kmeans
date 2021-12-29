@@ -43,13 +43,6 @@ public class Main {
 			rightAnswers[i] = dataFromFile[i][2]; 
 		}
 		
-		//////////////////////////////////////////////////////////////////////////
-
-
-		float LIoutputs[] = new float[D];
-		float LH1outputs[] = new float[H1];
-		float LH2outputs[] = new float[H2];
-		float Loutputs[] = new float[P];
 
 		//////////////////////
 		//CREATE PERCEPTRONS//
@@ -61,9 +54,15 @@ public class Main {
 		for(int i = 1;i < hiddenlayers+1;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
 				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i-1],"Tanh",1);
+				perceptrons[i][j].setNextLayerLength(perceptronsPerLayer[i+1]);
 			}
 		}
 		for(int i = 0;i < P;i++)perceptrons[hiddenlayers+1][i] = new perceptron(H2,"output",1);
+		
+		
+
+		
+		
 		
 		//////////////////////////////////////////////////////////////////////
 		
@@ -83,11 +82,82 @@ public class Main {
 				perceptronOutputs[i][j] = perceptrons[i][j].getOutput();
 			}
 		}
+		
 		for(int i = 0;i < 4;i++) {
-			
-			System.out.println(perceptrons[3][i].getOutput());
+			perceptronOutputs[3][i] = perceptrons[3][i].getOutput();
+			//System.out.println(perceptronOutputs[3][i]);
 		}
 
+		
+		////////////////////////////////
+		//calculate right answer array//
+		//////////////////////////////////////////////////////////////////////
+
+				
+		float[] rightanswer = new float[4];
+		for(int i = 0;i < 4;i++) {
+			if(i == rightAnswers[0] - 1) {
+				rightanswer[i] = 1;
+			}else {
+				rightanswer[i] = 0;
+			}
+		}
+
+
+		//////////////////////////////////////////////////////////////////////
+
+		///////////////////////////
+		//calculate output deltas//
+		//////////////////////////////////////////////////////////////////////
+
+		for(int i = 0;i < 4;i++) {
+			perceptrons[3][i].calcDelta(rightanswer[i]);
+		}
+		for(int i = hiddenlayers;i >= 0;i--) {
+			for(int j = 0;j < perceptronsPerLayer[i];j++) {
+				perceptrons[i][j].calcDelta( perceptronsPerLayer[i+1]);
+			}
+		}
+
+		
+		//////////////////////////////////////////////////////////////////////
+
+		///////////////////////////////////////////
+		//connect weights and deltas for backprop//
+		//////////////////////////////////////////////////////////////////////
+
+		
+		//connect weights
+
+		for(int i = 0;i < hiddenlayers+1;i++) {
+			for(int j = 0;j < perceptronsPerLayer[i];j++) {
+				float[] weights = new float[perceptronsPerLayer[i+1]];
+				for(int o = 0;o < perceptronsPerLayer[i+1];o++) {
+					weights[o] = perceptrons[i+1][o].getWeights()[j];
+				}
+				perceptrons[i][j].setOutputWeights(weights);
+			}
+		}
+		
+		//connect deltas
+		for(int i = 0;i < hiddenlayers+1;i++) {
+			for(int j = 0;j < perceptronsPerLayer[i];j++) {
+				float[] deltas = new float[perceptronsPerLayer[i+1]];
+				for(int o = 0;o < perceptronsPerLayer[i+1];o++) {
+					deltas[o] = perceptrons[i+1][o].getDelta();
+				}
+				perceptrons[i][j].setNextPerceptronDeltas(deltas);
+			}
+		}
+		
+		
+		System.out.println("\n\n");
+		for(int i = 0;i < 2;i++) {
+			perceptrons[2][i].getDelta();
+			System.out.println("\n");
+		}
+		perceptrons[1][1].getNextPerceptronDeltas();
+		
 		
 	    long end = System.currentTimeMillis();
 	    
