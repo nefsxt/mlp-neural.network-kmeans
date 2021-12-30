@@ -138,16 +138,18 @@ public class Main {
 
 		//////////////////////////////////////////////////////////////////////
 
-		float curr = passforward(inputs[0])[1];
+
+		////////////
+		//LEARN!!!//
+		//////////////////////////////////////////////////////////////////////
+		
 		calcErrorsAndpopagateDeltas(rightanswer);
 		for(int i = 0;i < hiddenlayers+2;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
 				perceptrons[i][j].updateWeights();
 			}
 		}
-		for(int o = 0;o < 100;o++) {
-			System.out.println(passforward(inputs[0])[1]);
-
+		for(int o = 0;o < 700;o++) { //epochs
 			passforward(inputs[0]);
 			calcErrorsAndpopagateDeltas(rightanswer);
 			for(int i = 0;i < hiddenlayers+2;i++) {
@@ -155,11 +157,9 @@ public class Main {
 					perceptrons[i][j].updateWeights();
 				}
 			}
-			//System.out.println(perceptrons[1][1].getWeights()[1]);
-			
 		}
 
-		
+		//////////////////////////////////////////////////////////////////////
 		
 		
 		
