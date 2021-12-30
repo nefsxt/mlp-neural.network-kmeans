@@ -19,6 +19,15 @@ public class Main {
 	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][4];
 	static float[][] perceptronOutputs = new float[hiddenlayers+2][4];
 	
+	public static float calculateError(float [] x,float[] rightanswer) {
+		float Error = 0;
+
+		for(int i = 0;i < 4;i++) {
+			Error += Math.pow((x[i] - rightanswer[i]),2);
+		}
+
+		return Error/4;
+	}
 	
 	public static void calcErrorsAndpopagateDeltas(float[] rightanswer) {
 		///////////////////////////
@@ -125,43 +134,51 @@ public class Main {
 		//calculate right answer array//
 		//////////////////////////////////////////////////////////////////////
 
-				
-		float[] rightanswer = new float[4];
-		for(int i = 0;i < 4;i++) {
-			if(i == rightAnswers[0] - 1) {
-				rightanswer[i] = 1;
-			}else {
-				rightanswer[i] = 0;
+		float[][] rightanswer = new float[10][4];
+		for(int i = 0;i < 10;i++) {
+			for(int j = 0;j < 4;j++) {
+				if(j == rightAnswers[i] - 1) {
+					rightanswer[i][j] = 1;
+				}else {
+					rightanswer[i][j] = 0;
+				}
 			}
 		}
-
-
 		//////////////////////////////////////////////////////////////////////
 
 
 		////////////
 		//LEARN!!!//
 		//////////////////////////////////////////////////////////////////////
-		
-		calcErrorsAndpopagateDeltas(rightanswer);
-		for(int i = 0;i < hiddenlayers+2;i++) {
-			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				perceptrons[i][j].updateWeights();
-			}
-		}
-		for(int o = 0;o < 700;o++) { //epochs
-			passforward(inputs[0]);
-			calcErrorsAndpopagateDeltas(rightanswer);
-			for(int i = 0;i < hiddenlayers+2;i++) {
-				for(int j = 0;j < perceptronsPerLayer[i];j++) {
-					perceptrons[i][j].updateWeights();
-				}
-			}
-		}
 
+		float MSE = 0;
+		IO.createFile("Errors.txt");
+		int q = 0;
+		for(int p = 0;p < 4;p++) {
+			MSE = calculateError(passforward(inputs[p]),rightanswer[p]);
+			while(MSE > 0.03 && Math.abs(MSE) < 20) { //epochs
+				q++;
+				IO.WriteToFile("Errors.txt", MSE, q);
+				MSE = calculateError(passforward(inputs[p]),rightanswer[p]);
+				calcErrorsAndpopagateDeltas(rightanswer[p]);
+				for(int i = 0;i < hiddenlayers+2;i++) {
+					for(int j = 0;j < perceptronsPerLayer[i];j++) {
+						perceptrons[i][j].updateWeights();
+					}
+				}
+				//System.out.println(MSE);
+			}
+			System.out.println("MSE:  " + MSE);
+			for(int i = 0;i < 4;i++) {
+				System.out.println(passforward(inputs[p])[i]);
+			}
+			System.out.println();
+			
+		}
+		
 		//////////////////////////////////////////////////////////////////////
-		
-		
+
+
 		
 	    long end = System.currentTimeMillis();
 	    

@@ -15,7 +15,7 @@ public class perceptron {
 	float[] outputweights;
 	float[] NextPerceptronDeltas;
 	int NextLayerLength;
-	float learningRate = 0.003f;
+	float learningRate = 0.002f;
 	
 	public perceptron(int inputsize,String function, float bias) {
 		this.function = function;
@@ -101,7 +101,7 @@ public class perceptron {
 	}
 	
 	public float getDelta() {
-		System.out.println(delta);
+		//System.out.println(delta);
 		return this.delta;
 	}
 	
