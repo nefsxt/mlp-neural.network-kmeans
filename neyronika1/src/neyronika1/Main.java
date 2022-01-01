@@ -1,5 +1,6 @@
 package neyronika1;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 import java.io.File;  // Import the File class
 import java.io.IOException;  // Import the IOException class to handle error
@@ -19,6 +20,14 @@ public class Main {
 	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][4];
 	static float[][] perceptronOutputs = new float[hiddenlayers+2][4];
 	
+	public static void updateWeights() {
+		for(int i = 1;i < hiddenlayers+2;i++) {
+			for(int j = 0;j < perceptronsPerLayer[i];j++) {
+				perceptrons[i][j].updateWeights();
+			}
+		}
+	}
+	
 	public static float calculateError(float [] x,float[] rightanswer) {
 		float Error = 0;
 
@@ -26,10 +35,10 @@ public class Main {
 			Error += Math.pow((x[i] - rightanswer[i]),2);
 		}
 
-		return Error/4;
+		return Error;
 	}
 	
-	public static void calcErrorsAndpopagateDeltas(float[] rightanswer) {
+	public static void backprop(float[] rightanswer) {
 		///////////////////////////
 		//calculate output deltas//
 		//////////////////////////////////////////////////////////////////////
@@ -105,11 +114,11 @@ public class Main {
 		
 		
 		float[][] dataFromFile = IO.ReadFromFile("dataset1withExamples.txt", 8000,3);
-		float[][] inputs = new float[10][2];
-		float[] rightAnswers = new float[10];
+		float[][] inputs = new float[8000][2];
+		float[] rightAnswers = new float[8000];
 
 		
-		for(int i = 0;i < 10;i++) {
+		for(int i = 0;i < 8000;i++) {
 			inputs[i][0] =  dataFromFile[i][0];
 			inputs[i][1] =  dataFromFile[i][1];
 
@@ -128,14 +137,14 @@ public class Main {
 				perceptrons[i][j].setNextLayerLength(perceptronsPerLayer[i+1]);
 			}
 		}
-		for(int i = 0;i < P;i++)perceptrons[hiddenlayers+1][i] = new perceptron(H2,"output",1);
+		for(int i = 0;i < P;i++)perceptrons[hiddenlayers+1][i] = new perceptron(H2,"Sig",1);
 		
 		////////////////////////////////
 		//calculate right answer array//
 		//////////////////////////////////////////////////////////////////////
 
-		float[][] rightanswer = new float[10][4];
-		for(int i = 0;i < 10;i++) {
+		float[][] rightanswer = new float[8000][4];
+		for(int i = 0;i < 8000;i++) {
 			for(int j = 0;j < 4;j++) {
 				if(j == rightAnswers[i] - 1) {
 					rightanswer[i][j] = 1;
@@ -154,26 +163,37 @@ public class Main {
 		float MSE = 0;
 		IO.createFile("Errors.txt");
 		int q = 0;
-		for(int p = 0;p < 4;p++) {
-			MSE = calculateError(passforward(inputs[p]),rightanswer[p]);
-			while(MSE > 0.03 && Math.abs(MSE) < 20) { //epochs
-				q++;
-				IO.WriteToFile("Errors.txt", MSE, q);
-				MSE = calculateError(passforward(inputs[p]),rightanswer[p]);
-				calcErrorsAndpopagateDeltas(rightanswer[p]);
+		for(int h = 0;h < 700;h++) { //epochs
+			q++;
+			MSE = 0;
+			for(int p = 0;p < 200;p++) {
+				for(int batch = 0;batch < 40;batch++) {
+					MSE += calculateError(passforward(inputs[p*40+batch]), rightanswer[p*40+batch]);
+					backprop(rightanswer[p*40+batch]);
+					//System.out.println(p*40+batch);
+				}
+				updateWeights();
 				for(int i = 0;i < hiddenlayers+2;i++) {
 					for(int j = 0;j < perceptronsPerLayer[i];j++) {
-						perceptrons[i][j].updateWeights();
+						perceptrons[i][j].setDelta(0);
 					}
 				}
-				//System.out.println(MSE);
 			}
-			System.out.println("MSE:  " + MSE);
-			for(int i = 0;i < 4;i++) {
-				System.out.println(passforward(inputs[p])[i]);
+			System.out.println("epoch=  " + h);
+			IO.WriteToFile("Errors.txt",MSE , q);
+
+		}
+		
+		float[] out;
+		for(int i = 0;i < 20;i++) {
+			out = passforward(inputs[i]);
+			//System.out.println(max(out));  
+		}
+		for(int i = 0;i < 4;i++) {
+			for(int j = 0;j < 4;j++) {
+				System.out.println(passforward(inputs[i])[j]);
 			}
 			System.out.println();
-			
 		}
 		
 		//////////////////////////////////////////////////////////////////////
@@ -185,6 +205,18 @@ public class Main {
 	    System.out.println((end - start) + " ms");
 
 	}
+	public static int max(float[] in) {
+		float max = 0;
+		int ret = 0;
+		for(int i = 0;i<4;i++) {
+			if(in[i] > max) {
+				max = in[i];
+				ret = i+1;
+			}
+		}
+		return ret;
+	}
 }
+
 
 
