@@ -11,16 +11,16 @@ import java.lang.reflect.Array;
 
 
 public class Main {	
-	static int hiddenlayers = 3;
+	static int hiddenlayers = 2;
 	static int D = 2;
-	static int H1 = 3;
-	static int H2 = 3;
-	static int H3 = 3;
+	static int H1 = 5;
+	static int H2 = 5;
+	static int H3 = 5;
 	static int P = 4;
-	static int perceptronsPerLayer[] = {2,3,3,3,4};
+	static int perceptronsPerLayer[] = {2,5,5,4};
 	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][6];
 	static float[][] perceptronOutputs = new float[hiddenlayers+2][6];
-	static int batchSize = 40;
+	static int batchSize = 1;
 	
 	public static void updateWeights() {
 		for(int i = 0;i < hiddenlayers+2;i++) {

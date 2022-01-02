@@ -3,20 +3,11 @@ package neyronika1;
 import java.util.Random;
 
 public class S1_S2 {
-	static float[][] c1 = new float[8000][2];
-	static float[][] c2 = new float[8000][2];
-	static float[][] c3 = new float[8000][2];
-	static float[][] c4 = new float[8000][2];
-	static int c1size = 0;
-	static int c2size = 0;
-	static int c3size = 0;
-	static int c4size = 0;
 	
 	
-	public static void createS1() {		
-		IO.createFile("dataset1.txt");
+	public static void createS1() {
 		IO.createFile("dataset1withExamples.txt");
-
+		int rng = 0;
 	        
 	    Random rand = new Random();
 
@@ -24,61 +15,67 @@ public class S1_S2 {
 	    for(int i = 0;i < 8000;i++) {
 	    	dataset[i][0] = rand.nextFloat()*2 - 1;
 	        dataset[i][1] = rand.nextFloat()*2 - 1;
-	        IO.WriteToFile("dataset1.txt",dataset[i][0],dataset[i][1]);
 	    }
 	   
-	    //katigoriopoihsh
-
-
-	    for(int i = 0;i < 8000;i++) {
-	    	c1[i][0] = -2;
-	    	c2[i][0] = -2;
-	    	c3[i][0] = -2;
-	    	c4[i][0] = -2;
-	    }
 		
 	    for(int i = 0;i < 8000;i++) {
 	    	if(Math.pow(dataset[i][0] - 0.5,2) + Math.pow(dataset[i][1] - 0.5,2) < 0.16 ||
 	    			Math.pow(dataset[i][0] + 0.5,2) + Math.pow(dataset[i][1] + 0.5,2) < 0.16) {
-	    		c1[c1size][0] = dataset[i][0];
-	    		c1[c1size][1] = dataset[i][1];
-	    		c1size++;
+				if(rand.nextFloat() < 0.1 && i < 4000) { //c1
+					rng = rand.nextInt(3)+1;
+					if(rng == 1) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"2");
+					}else if (rng == 2) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"3");
+					}else if (rng == 3) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"4");
+					}
+				}else {
+					IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"1");
+				}
 	    	}else if(Math.pow(dataset[i][0] - 0.5,2) + Math.pow(dataset[i][1] + 0.5,2) < 0.16 ||
 	    			Math.pow(dataset[i][0] + 0.5,2) + Math.pow(dataset[i][1] - 0.5,2) < 0.16) {
-	    		c2[c2size][0] = dataset[i][0];
-	    		c2[c2size][1] = dataset[i][1];
-	    		c2size++;
-	    	}else if((dataset[i][0] > 0 && dataset[i][1] > 0) ||
-	    			(dataset[i][0] < 0 && dataset[i][1] < 0)) {
-	    		c3[c3size][0] = dataset[i][0];
-	    		c3[c3size][1] = dataset[i][1];
-	    		c3size++;
+				if(rand.nextFloat() < 0.1 && i < 4000) { //c2
+					rng = rand.nextInt(3)+1;
+					if(rng == 1) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"1");
+					}else if (rng == 2) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"3");
+					}else if (rng == 3) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"4");
+					}
+				}else {
+					IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"2");
+				}
+	    	}else if((dataset[i][0] > 0 && dataset[i][1] > 0) || (dataset[i][0] < 0 && dataset[i][1] < 0)) {
+				if(rand.nextFloat() < 0.1 && i < 4000) { //c3
+					rng = rand.nextInt(3)+1;
+					if(rng == 1) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"1");
+					}else if (rng == 2) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"2");
+					}else if (rng == 3) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"4");
+					}
+				}else {
+					IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"3");
+				}
 	    		
 	    	}else {
-	    		c4[c4size][0] = dataset[i][0];
-	    		c4[c4size][1] = dataset[i][1];
-	    		c4size++;
+				if(rand.nextFloat() < 0.1 && i < 4000) { //c4
+					rng = rand.nextInt(3)+1;
+					if(rng == 1) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"1");
+					}else if (rng == 2) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"2");
+					}else if (rng == 3) {
+						IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"3");
+					}
+				}else {
+					IO.WriteToFile("dataset1withExamples.txt",dataset[i][0],dataset[i][1],"4");
+				}
 	    	}
-	    }
-		
-	    for(int i = 0;i < 8000;i++) {
-	    	
-	    	
-	    	if(c1[i][0] != -2.0) {
-		    	IO.WriteToFile("dataset1withExamples.txt",c1[i][0],c1[i][1],"1");
-	    	}
-	    	if(c2[i][0] != -2.0) {
-		    	IO.WriteToFile("dataset1withExamples.txt",c2[i][0],c2[i][1],"2");
-	    	}
-	    	if(c3[i][0] != -2.0) {
-		    	IO.WriteToFile("dataset1withExamples.txt",c3[i][0],c3[i][1],"3");
-	    	}
-	    	if(c4[i][0] != -2.0) {
-		    	IO.WriteToFile("dataset1withExamples.txt",c4[i][0],c4[i][1],"4");
-	    	}
-	    }
-	    
-	    
+	    }	    
 	}
 	
 	public static void createS2() {
@@ -139,61 +136,6 @@ public class S1_S2 {
 		
 	    for(int i = 0;i < 1200;i++) {
 	    	IO.WriteToFile("dataset.txt",dataset[i][0],dataset[i][1]);
-	    }
-	}
-	
-	
-	
-	public static void createNoise() {
-	    int rng = 0;
-	    Random rand = new Random();
-
-	    for(int i = 0;i < 8000;i++) {
-			if(rand.nextFloat() < 0.1 && c1[i][0] != -2.0) { //c1
-				rng = rand.nextInt(3)+1;
-				if(rng == 1) {
-			    	IO.WriteToFile("c2.txt",c1[i][0],c1[i][1]);
-				}else if (rng == 2) {
-			    	IO.WriteToFile("c3.txt",c1[i][0],c1[i][1]);
-				}else if (rng == 3) {
-			    	IO.WriteToFile("c4.txt",c1[i][0],c1[i][1]);
-				}
-				c1[i][0] = -2;
-			}
-			if(rand.nextFloat() < 0.1 && c2[i][0] != -2.0) { //c2
-				rng = rand.nextInt(3)+1;
-
-				if(rng == 1) {
-			    	IO.WriteToFile("c1.txt",c2[i][0],c2[i][1]);
-				}else if (rng == 2) {
-			    	IO.WriteToFile("c3.txt",c2[i][0],c2[i][1]);
-				}else if (rng == 3) {
-			    	IO.WriteToFile("c4.txt",c2[i][0],c2[i][1]);
-				}
-				c2[i][0] = -2;
-			}
-			if(rand.nextFloat() < 0.1 && c3[i][0] != -2.0) { //c3
-				rng = rand.nextInt(3)+1;
-				if(rng == 1) {
-			    	IO.WriteToFile("c1.txt",c3[i][0],c3[i][1]);
-				}else if (rng == 2) {
-			    	IO.WriteToFile("c2.txt",c3[i][0],c3[i][1]);
-				}else{
-			    	IO.WriteToFile("c4.txt",c3[i][0],c3[i][1]);
-				}
-				c3[i][0] = -2;
-			}
-			if(rand.nextFloat() < 0.1 && c4[i][0] != -2.0) { //c4
-				rng = rand.nextInt(3)+1;
-				if(rng == 1) {
-			    	IO.WriteToFile("c1.txt",c4[i][0],c4[i][1]);
-				}else if (rng == 2) {
-			    	IO.WriteToFile("c2.txt",c4[i][0],c4[i][1]);
-				}else if (rng == 3) {
-			    	IO.WriteToFile("c3.txt",c4[i][0],c4[i][1]);
-				}
-				c4[i][0] = -2;
-			}
 	    }
 	}
 }

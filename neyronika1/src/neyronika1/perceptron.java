@@ -17,8 +17,8 @@ public class perceptron {
 	float[] outputweights;
 	float[] NextPerceptronDeltas;
 	int NextLayerLength;
-	float learningRate = 0.3f;
-	int batchsize = 400;
+	float learningRate = 0.005f;
+	int batchsize = 40;
 	
 	public perceptron(int inputsize,String function, float bias,int batchsize) {
 		this.batchsize = batchsize;
