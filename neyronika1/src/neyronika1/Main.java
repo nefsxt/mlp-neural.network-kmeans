@@ -11,19 +11,28 @@ import java.lang.reflect.Array;
 
 
 public class Main {	
-	static int hiddenlayers = 2;
+	static int hiddenlayers = 3;
 	static int D = 2;
-	static int H1 = 2;
-	static int H2 = 2;
+	static int H1 = 3;
+	static int H2 = 3;
+	static int H3 = 3;
 	static int P = 4;
-	static int perceptronsPerLayer[] = {2,2,2,4};
-	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][4];
-	static float[][] perceptronOutputs = new float[hiddenlayers+2][4];
+	static int perceptronsPerLayer[] = {2,3,3,3,4};
+	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][6];
+	static float[][] perceptronOutputs = new float[hiddenlayers+2][6];
+	static int batchSize = 40;
 	
 	public static void updateWeights() {
 		for(int i = 0;i < hiddenlayers+2;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
 				perceptrons[i][j].updateWeights();
+			}
+		}
+	}
+	public static void updateBatchWeights() {
+		for(int i = 0;i < hiddenlayers+2;i++) {
+			for(int j = 0;j < perceptronsPerLayer[i];j++) {
+				perceptrons[i][j].updateBatchWeights();
 			}
 		}
 	}
@@ -44,7 +53,7 @@ public class Main {
 		//////////////////////////////////////////////////////////////////////
 		
 		for(int i = 0;i < 4;i++) {//output layer
-			perceptrons[3][i].calcDelta(rightanswer[i]);
+			perceptrons[hiddenlayers + 1][i].calcDelta(rightanswer[i]);
 		}
 		
 		for(int i = hiddenlayers;i >= 0;i--) {
@@ -82,7 +91,7 @@ public class Main {
 			}
 		}
 		for(int i = 0;i < 4;i++) {
-			perceptronOutputs[3][i] = perceptrons[3][i].getOutput();
+			perceptronOutputs[hiddenlayers + 1][i] = perceptrons[hiddenlayers + 1][i].getOutput();
 		}
 		return perceptronOutputs[3];
 	}
@@ -116,15 +125,15 @@ public class Main {
 		//CREATE PERCEPTRONS//
 		//////////////////////////////////////////////////////////////////////
 		
-		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i] = new perceptron(1,"Tanh",0);
+		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i] = new perceptron(1,"Tanh",0,batchSize);
 		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i].setNextLayerLength(perceptronsPerLayer[1]);
 		for(int i = 1;i < hiddenlayers+1;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i],"Tanh",1);
+				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i],"Tanh",1,batchSize);
 				perceptrons[i][j].setNextLayerLength(perceptronsPerLayer[i+1]);
 			}
 		}
-		for(int i = 0;i < P;i++)perceptrons[hiddenlayers+1][i] = new perceptron(H2,"Sig",1);
+		for(int i = 0;i < P;i++)perceptrons[hiddenlayers+1][i] = new perceptron(perceptronsPerLayer[hiddenlayers],"Sig",1,batchSize);
 		
 		////////////////////////////////
 		//calculate right answer array//
@@ -146,43 +155,39 @@ public class Main {
 		////////////
 		//LEARN!!!//
 		//////////////////////////////////////////////////////////////////////
+		float prevMSE = 0;
 		float MSE = 0;
 		IO.createFile("Errors.txt");
-		int q = 1;
+		int h = 0;
+		
 	
 		
 		
-		for(int h = 0;h < 3000;h++) { //epochs
-			q++;
+		while(h < 700 || Math.abs(prevMSE - MSE) > 10E-10) { //epochs
+			prevMSE = MSE;
+			h++;
 			MSE = 0;
-			for(int p = 0;p < 400;p++) {
+			for(int p = 0;p < 4000/batchSize;p++) {
 
-			//	for(int i = 0;i < hiddenlayers+2;i++) {
-			//		for(int j = 0;j < perceptronsPerLayer[i];j++) {
-			//			perceptrons[i][j].setDelta(0);
-			//		}
-			//	}
-				for(int batch = 0;batch < 10;batch++) {
-					MSE += calculateError(passforward(inputs[p*10 + batch]), rightanswer[p*10 + batch]);
-					backprop(rightanswer[p*10 + batch]);
+				for(int batch = 0;batch < batchSize;batch++) {
+					MSE += calculateError(passforward(inputs[p*batchSize + batch]), rightanswer[p*batchSize + batch]);
+					backprop(rightanswer[p*batchSize + batch]);
 					updateWeights();
 				}
-				
+				updateBatchWeights();
 
-				
 			}
-			float success = 0;
+			float success = 0; //test success rate
 			for(int p = 4000;p < 8000;p++) {
 				if((float)max(passforward(inputs[p])) == (float)rightAnswers[p]) {
 					success++;
 				}
 			}
 			
-			
-			
-			//System.out.println("epoch=  " + h);
+			System.out.println(prevMSE - MSE + " " + h);
 			System.out.println(success/4000 + "% "+ h);
-			IO.WriteToFile("Errors.txt",success/4000, q);
+			//System.out.println(MSE/4000 + "% "+ h);
+			IO.WriteToFile("Errors.txt",success/4000, h);
 		}
 		
 		for(int i = 0;i < 4;i++) {
@@ -212,6 +217,7 @@ public class Main {
 		}
 		return ret;
 	}
+	
 }
 
 

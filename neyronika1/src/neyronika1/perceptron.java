@@ -8,16 +8,20 @@ public class perceptron {
 	float[] input;
 	float output;
 	float[] weights;
+	float[] dweights;
 	float u;
 	float bias = 1;
+	float dbias = 0;
 	float delta = 0;
 	String function;
 	float[] outputweights;
 	float[] NextPerceptronDeltas;
 	int NextLayerLength;
-	float learningRate = 0.001f;
+	float learningRate = 0.3f;
+	int batchsize = 400;
 	
-	public perceptron(int inputsize,String function, float bias) {
+	public perceptron(int inputsize,String function, float bias,int batchsize) {
+		this.batchsize = batchsize;
 		this.function = function;
 		this.bias = bias;
 	    Random rand = new Random();
@@ -26,6 +30,7 @@ public class perceptron {
 		this.inputsize = inputsize;
 		this.input = new float[inputsize];
 		this.weights = new float[inputsize];
+		this.dweights = new float[inputsize];
 		
 		for (int i = 0;i < inputsize;i++) {
 			this.weights[i] = rand.nextFloat()*2 -1;
@@ -76,10 +81,18 @@ public class perceptron {
 	}
 	
 	public void updateWeights() {
-		bias = bias + learningRate*delta;
+		dbias += learningRate*delta;
 		for(int i = 0;i < inputsize;i++) {
-			weights[i] = weights[i] + learningRate*delta*input[i];
+			dweights[i] += learningRate*delta*input[i];
 		}
+	}
+	public void updateBatchWeights() {
+		bias += dbias / batchsize;
+		for(int i = 0;i < inputsize;i++) {
+			weights[i] += dweights[i] / batchsize;
+			dweights[i] = 0;
+		}
+		dbias = 0;
 	}
 	
 	////////////////////////
