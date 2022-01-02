@@ -7,7 +7,7 @@ import java.io.IOException;  // Import the IOException class to handle error
 import java.lang.Math;
 import java.lang.reflect.Array;
 
-//test
+
 
 
 public class Main {	
@@ -21,7 +21,7 @@ public class Main {
 	static float[][] perceptronOutputs = new float[hiddenlayers+2][4];
 	
 	public static void updateWeights() {
-		for(int i = 1;i < hiddenlayers+2;i++) {
+		for(int i = 0;i < hiddenlayers+2;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
 				perceptrons[i][j].updateWeights();
 			}
@@ -34,48 +34,34 @@ public class Main {
 		for(int i = 0;i < 4;i++) {
 			Error += Math.pow((x[i] - rightanswer[i]),2);
 		}
-
 		return Error;
 	}
 	
 	public static void backprop(float[] rightanswer) {
-		///////////////////////////
-		//calculate output deltas//
+		
+		//////////////////////////////////
+		//calculate deltas and propagate//
 		//////////////////////////////////////////////////////////////////////
-
-		for(int i = 0;i < 4;i++) {
+		
+		for(int i = 0;i < 4;i++) {//output layer
 			perceptrons[3][i].calcDelta(rightanswer[i]);
 		}
+		
 		for(int i = hiddenlayers;i >= 0;i--) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				perceptrons[i][j].calcDelta( perceptronsPerLayer[i+1]);
-			}
-		}
-		///////////////////////////////////////////
-		//connect weights and deltas for backprop//
-		//////////////////////////////////////////////////////////////////////
-
-		//connect weights
-		for(int i = 0;i < hiddenlayers+1;i++) {
-			for(int j = 0;j < perceptronsPerLayer[i];j++) {
+				float[] deltas = new float[perceptronsPerLayer[i+1]];
 				float[] weights = new float[perceptronsPerLayer[i+1]];
 				for(int o = 0;o < perceptronsPerLayer[i+1];o++) {
+					deltas[o] = perceptrons[i+1][o].getDelta();
 					weights[o] = perceptrons[i+1][o].getWeights()[j];
 				}
-				perceptrons[i][j].setOutputWeights(weights);
-			}
-		}
-		
-		//connect deltas
-		for(int i = 0;i < hiddenlayers+1;i++) {
-			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				float[] deltas = new float[perceptronsPerLayer[i+1]];
-				for(int o = 0;o < perceptronsPerLayer[i+1];o++) {
-					deltas[o] = perceptrons[i+1][o].getDelta();
-				}
 				perceptrons[i][j].setNextPerceptronDeltas(deltas);
+				perceptrons[i][j].setOutputWeights(weights);
+				perceptrons[i][j].calcDelta();
 			}
 		}
+
+
 	}
 	
 	public static float[] passforward(float[] inputs) {
@@ -130,10 +116,11 @@ public class Main {
 		//CREATE PERCEPTRONS//
 		//////////////////////////////////////////////////////////////////////
 		
-		for(int i = 0;i < D;i++) perceptrons[0][i] = new perceptron(1,"Tanh",0);
+		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i] = new perceptron(1,"Tanh",0);
+		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i].setNextLayerLength(perceptronsPerLayer[1]);
 		for(int i = 1;i < hiddenlayers+1;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i-1],"Tanh",1);
+				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i],"Tanh",1);
 				perceptrons[i][j].setNextLayerLength(perceptronsPerLayer[i+1]);
 			}
 		}
@@ -159,36 +146,45 @@ public class Main {
 		////////////
 		//LEARN!!!//
 		//////////////////////////////////////////////////////////////////////
-
 		float MSE = 0;
 		IO.createFile("Errors.txt");
-		int q = 0;
-		for(int h = 0;h < 700;h++) { //epochs
+		int q = 1;
+	
+		
+		
+		for(int h = 0;h < 3000;h++) { //epochs
 			q++;
 			MSE = 0;
-			for(int p = 0;p < 200;p++) {
-				for(int batch = 0;batch < 40;batch++) {
-					MSE += calculateError(passforward(inputs[p*40+batch]), rightanswer[p*40+batch]);
-					backprop(rightanswer[p*40+batch]);
-					//System.out.println(p*40+batch);
+			for(int p = 0;p < 400;p++) {
+
+			//	for(int i = 0;i < hiddenlayers+2;i++) {
+			//		for(int j = 0;j < perceptronsPerLayer[i];j++) {
+			//			perceptrons[i][j].setDelta(0);
+			//		}
+			//	}
+				for(int batch = 0;batch < 10;batch++) {
+					MSE += calculateError(passforward(inputs[p*10 + batch]), rightanswer[p*10 + batch]);
+					backprop(rightanswer[p*10 + batch]);
+					updateWeights();
 				}
-				updateWeights();
-				for(int i = 0;i < hiddenlayers+2;i++) {
-					for(int j = 0;j < perceptronsPerLayer[i];j++) {
-						perceptrons[i][j].setDelta(0);
-					}
+				
+
+				
+			}
+			float success = 0;
+			for(int p = 4000;p < 8000;p++) {
+				if((float)max(passforward(inputs[p])) == (float)rightAnswers[p]) {
+					success++;
 				}
 			}
-			System.out.println("epoch=  " + h);
-			IO.WriteToFile("Errors.txt",MSE , q);
-
+			
+			
+			
+			//System.out.println("epoch=  " + h);
+			System.out.println(success/4000 + "% "+ h);
+			IO.WriteToFile("Errors.txt",success/4000, q);
 		}
 		
-		float[] out;
-		for(int i = 0;i < 20;i++) {
-			out = passforward(inputs[i]);
-			//System.out.println(max(out));  
-		}
 		for(int i = 0;i < 4;i++) {
 			for(int j = 0;j < 4;j++) {
 				System.out.println(passforward(inputs[i])[j]);

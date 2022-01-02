@@ -16,10 +16,6 @@ public class S1_S2 {
 	public static void createS1() {		
 		IO.createFile("dataset1.txt");
 		IO.createFile("dataset1withExamples.txt");
-		IO.createFile("c1.txt");
-		IO.createFile("c2.txt");
-		IO.createFile("c3.txt");
-		IO.createFile("c4.txt");
 
 	        
 	    Random rand = new Random();
@@ -64,7 +60,6 @@ public class S1_S2 {
 	    		c4size++;
 	    	}
 	    }
-
 		
 	    for(int i = 0;i < 8000;i++) {
 	    	

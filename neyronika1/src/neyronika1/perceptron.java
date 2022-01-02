@@ -10,12 +10,12 @@ public class perceptron {
 	float[] weights;
 	float u;
 	float bias = 1;
-	public float delta;
+	float delta = 0;
 	String function;
 	float[] outputweights;
 	float[] NextPerceptronDeltas;
 	int NextLayerLength;
-	float learningRate = 0.01f;
+	float learningRate = 0.001f;
 	
 	public perceptron(int inputsize,String function, float bias) {
 		this.function = function;
@@ -55,8 +55,9 @@ public class perceptron {
 		for(int i = 0;i < NextLayerLength;i++) {
 			SUM += outputweights[i] * NextPerceptronDeltas[i];
 		}
+		
 		if(function.equals("Tanh")) {
-			this.delta += (float)(1 - Math.pow(Math.tanh(this.u),2)) * SUM;
+			this.delta = (float)(1 - Math.pow(Math.tanh(this.u),2)) * SUM;
 		}else if(function.equals("Relu")){
 			if(this.u < 0) {
 				this.delta = 0f;
@@ -64,19 +65,20 @@ public class perceptron {
 				this.delta = SUM;
 			}
 		}else if(function.equals("Sig")){
-			this.delta += sigmoid(this.u) * (1 - sigmoid(this.u));
+			this.delta = sigmoid(this.u) * (1 - sigmoid(this.u));
 		}
 	}
 	
 	public void calcDelta(float rightAnswer) {
-		this.delta += (sigmoid(this.u) * (1 - sigmoid(this.u))) * (rightAnswer - this.output);
+		this.delta = (sigmoid(this.u) * (1 - sigmoid(this.u))) * (rightAnswer - this.output);
+		//this.delta = (rightAnswer - this.output);
 		//System.out.println(this.delta);
 	}
 	
 	public void updateWeights() {
-		bias = bias +  learningRate*delta;
+		bias = bias + learningRate*delta;
 		for(int i = 0;i < inputsize;i++) {
-			weights[i] = weights[i] + learningRate*delta*output;
+			weights[i] = weights[i] + learningRate*delta*input[i];
 		}
 	}
 	
@@ -97,6 +99,10 @@ public class perceptron {
 	///////////////////
 	//SETTERS GETTERS//
 	//////////////////////////////////////////////////////////////////////
+	public void setLearningRate(float i) {
+		this.learningRate = i;
+	}
+	
 	
 	public void setNextLayerLength(int length) {
 		this.NextLayerLength = length;

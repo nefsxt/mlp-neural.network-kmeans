@@ -41,6 +41,16 @@ public class IO {
 	        e.printStackTrace();
 	    }
 	}
+	public static void WriteToFile(String FileName,float x1, float x2, String x3, String x4) {
+	    try {
+	        FileWriter myWriter = new FileWriter(FileName,true);
+	        myWriter.write(x1 + "," + x2 + "," + x3 + "," + x4 + "\n");
+	        myWriter.close();
+	      } catch (IOException e) {
+	        System.out.println("An error occurred.");
+	        e.printStackTrace();
+	    }
+	}
 
 	
 	public static float[][] ReadFromFile(String FileName,int FileLines,int infoNum) {
