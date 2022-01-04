@@ -1,6 +1,3 @@
-package neyronika1;
-
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner; // Import the Scanner class to read text files

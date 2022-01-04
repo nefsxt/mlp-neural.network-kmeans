@@ -36,11 +36,6 @@
 			<location>C:/Users/stratis/eclipse-workspace/neyronika1/c4.txt</location>
 		</link>
 		<link>
-			<name>src/neyronika1/dataset1.txt</name>
-			<type>1</type>
-			<locationURI>PROJECT_LOC/dataset1.txt</locationURI>
-		</link>
-		<link>
 			<name>src/neyronika1/dataset1withExamples.txt</name>
 			<type>1</type>
 			<location>C:/Users/stratis/eclipse-workspace/neyronika1/dataset1withExamples.txt</location>

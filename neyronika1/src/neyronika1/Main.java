@@ -1,26 +1,20 @@
 package neyronika1;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
-import java.io.File;  // Import the File class
-import java.io.IOException;  // Import the IOException class to handle error
+
 import java.lang.Math;
-import java.lang.reflect.Array;
 
 
 
 
-public class Main {	
-	static int hiddenlayers = 2;
-	static int D = 2;
-	static int H1 = 15;
-	static int H2 = 15;
-	static int H3 = 15;
-	static int P = 4;
-	static int perceptronsPerLayer[] = {2,15,15,4};
-	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][15];
-	static float[][] perceptronOutputs = new float[hiddenlayers+2][15];
-	static int batchSize = 400;
+public class Main {
+	public static final int hiddenlayers = 2;
+	public static final int perceptronsPerLayer[] = {2,6,6,4};
+	public static final int batchSize = 40;
+	public static final float learningRate = 0.05f;
+	
+	
+	static perceptron perceptrons[][] = new perceptron[hiddenlayers+2][perceptronsPerLayer[max(perceptronsPerLayer)-1]];
+	static float[][] perceptronOutputs = new float[hiddenlayers+2][perceptronsPerLayer[max(perceptronsPerLayer)-1]];
+	
 	
 	public static void updateWeights() {
 		for(int i = 0;i < hiddenlayers+2;i++) {
@@ -47,7 +41,6 @@ public class Main {
 	}
 	
 	public static void backprop(float[] rightanswer) {
-		
 		//////////////////////////////////
 		//calculate deltas and propagate//
 		//////////////////////////////////////////////////////////////////////
@@ -78,7 +71,7 @@ public class Main {
 		//PUT INPUTS AND PASS FORWARD//
 		//////////////////////////////////////////////////////////////////////
 		
-		for(int i = 0;i < D;i++) { //layerinput
+		for(int i = 0;i < perceptronsPerLayer[0];i++) { //layerinput
 			perceptrons[0][i].setInputs(inputs[i]);
 			perceptrons[0][i].evaluate();
 			perceptronOutputs[0][i] = perceptrons[0][i].getOutput();
@@ -93,7 +86,7 @@ public class Main {
 		for(int i = 0;i < 4;i++) {
 			perceptronOutputs[hiddenlayers + 1][i] = perceptrons[hiddenlayers + 1][i].getOutput();
 		}
-		return perceptronOutputs[3];
+		return perceptronOutputs[hiddenlayers + 1];
 	}
 	
 	public static void main(String[] args) {
@@ -125,15 +118,17 @@ public class Main {
 		//CREATE PERCEPTRONS//
 		//////////////////////////////////////////////////////////////////////
 		
-		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i] = new perceptron(1,"Tanh",0,batchSize);
+		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i] = new perceptron(1,"Tanh",0,batchSize,learningRate);
 		for(int i = 0;i < perceptronsPerLayer[0];i++) perceptrons[0][i].setNextLayerLength(perceptronsPerLayer[1]);
 		for(int i = 1;i < hiddenlayers+1;i++) {
 			for(int j = 0;j < perceptronsPerLayer[i];j++) {
-				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i],"Tanh",1,batchSize);
+				perceptrons[i][j] = new perceptron(perceptronsPerLayer[i],"Tanh",1,batchSize,learningRate);
 				perceptrons[i][j].setNextLayerLength(perceptronsPerLayer[i+1]);
 			}
 		}
-		for(int i = 0;i < P;i++)perceptrons[hiddenlayers+1][i] = new perceptron(perceptronsPerLayer[hiddenlayers],"Sig",1,batchSize);
+		for(int i = 0;i < perceptronsPerLayer[hiddenlayers + 1];i++) {
+			perceptrons[hiddenlayers+1][i] = new perceptron(perceptronsPerLayer[hiddenlayers],"Sig",1,batchSize,learningRate);
+		}
 		
 		////////////////////////////////
 		//calculate right answer array//
@@ -152,24 +147,23 @@ public class Main {
 		//////////////////////////////////////////////////////////////////////
 
 
-		////////////
-		//LEARN!!!//
+		/////////
+		//TRAIN//
 		//////////////////////////////////////////////////////////////////////
 		float prevMSE = 0;
 		float MSE = 0;
-		IO.createFile("Errors.txt");
 		int h = 0;
+		IO.createFile("Errors.txt");
+		IO.ClearFile("Errors.txt");
 		
-	
-		
-		
-		while(h < 700 || Math.abs(prevMSE - MSE) > 10E-10) { //epochs
+		while(h < 700 || Math.abs(prevMSE - MSE) > 0.02) { //epochs
 			prevMSE = MSE;
 			h++;
 			MSE = 0;
 			for(int p = 0;p < 4000/batchSize;p++) {
 
 				for(int batch = 0;batch < batchSize;batch++) {
+					
 					MSE += calculateError(passforward(inputs[p*batchSize + batch]), rightanswer[p*batchSize + batch]);
 					backprop(rightanswer[p*batchSize + batch]);
 					updateWeights();
@@ -184,17 +178,9 @@ public class Main {
 				}
 			}
 			
-			System.out.println(prevMSE - MSE + " " + h);
+			//System.out.println(prevMSE - MSE + " " + h);
 			System.out.println(success/4000 + "% "+ h);
-			//System.out.println(MSE/4000 + "% "+ h);
 			IO.WriteToFile("Errors.txt",success/4000, h);
-		}
-		
-		for(int i = 0;i < 4;i++) {
-			for(int j = 0;j < 4;j++) {
-				System.out.println(passforward(inputs[i])[j]);
-			}
-			System.out.println();
 		}
 		
 		//////////////////////////////////////////////////////////////////////
@@ -209,7 +195,18 @@ public class Main {
 	public static int max(float[] in) {
 		float max = 0;
 		int ret = 0;
-		for(int i = 0;i<4;i++) {
+		for(int i = 0;i<in.length;i++) {
+			if(in[i] > max) {
+				max = in[i];
+				ret = i+1;
+			}
+		}
+		return ret;
+	}
+	public static int max(int[] in) {
+		float max = 0;
+		int ret = 0;
+		for(int i = 0;i<in.length;i++) {
 			if(in[i] > max) {
 				max = in[i];
 				ret = i+1;

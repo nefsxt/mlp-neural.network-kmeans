@@ -1,6 +1,5 @@
 package neyronika1;
 
-import java.lang.reflect.Array;
 import java.util.Random;
 
 public class perceptron {
@@ -17,10 +16,11 @@ public class perceptron {
 	float[] outputweights;
 	float[] NextPerceptronDeltas;
 	int NextLayerLength;
-	float learningRate = 0.002f;
+	float learningRate = 0.01f;
 	int batchsize = 40;
 	
-	public perceptron(int inputsize,String function, float bias,int batchsize) {
+	public perceptron(int inputsize,String function, float bias,int batchsize,float learingingRate) {
+		this.learningRate = learingingRate;
 		this.batchsize = batchsize;
 		this.function = function;
 		this.bias = bias;
